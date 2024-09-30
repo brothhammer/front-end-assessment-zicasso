@@ -13,11 +13,26 @@
   padding: 1rem; /* Add padding inside the container */
 }
 
+/* default larger screen layout */
 .images {
   display: grid;
   grid-template-columns: repeat(4, 1fr); /* 4 columns */
   grid-template-rows: repeat(3, auto); /* 3 rows */
   gap: 20px; /* Space between cards */
+}
+
+/* Grid layout for screens below 768px */
+@media (max-width: 768px) {
+  .images {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Grid layout for screens below 480px */
+@media (max-width: 480px) {
+  .images {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .card {
