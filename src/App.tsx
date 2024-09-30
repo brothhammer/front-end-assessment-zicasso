@@ -81,19 +81,23 @@ const App = () => {
   const [isFlippingAllowed, setIsFlippingAllowed] = useState(true);
 
   // shuffle the images, double them, add unique id and shuffle again
-  useEffect(() => {
+  const shuffleImages = () => {
     const imagesCopy = imagesArray.slice();
-    const shuffledCopy = shuffleArray(imagesCopy)
-    const randomImages = shuffledCopy.slice(0, 6)
-    const doubleImages = [...randomImages, ...randomImages]
-    const shuffledDoubleImages = shuffleArray(doubleImages)
+    const shuffledCopy = shuffleArray(imagesCopy);
+    const randomImages = shuffledCopy.slice(0, 6);
+    const doubleImages = [...randomImages, ...randomImages];
+    const shuffledDoubleImages = shuffleArray(doubleImages);
     const imagesWithUniqueId = shuffledDoubleImages.map((image, index) => ({
       ...image,
       uniqueId: `${image.id}-${index}`
-    })
-    )
-    setShuffledImages(imagesWithUniqueId)
-  }, [])
+    }));
+    setShuffledImages(imagesWithUniqueId);
+  };
+
+  // shuffle the images on component mount
+  useEffect(() => {
+    shuffleImages();
+  }, []);
 
   const handleFlip = (uniqueId: string, id: string) => {
     if (!isFlippingAllowed) return;
@@ -104,6 +108,13 @@ const App = () => {
         : [...prevState, uniqueId]
     );
   };
+
+  const handleReset = () => {
+    setFlipped([]);
+    setCurrentTurn([]);
+    setIsFlippingAllowed(true);
+    shuffleImages();
+  }
 
   const checkMatch = useCallback((currentTurn: string[]) => {
     if (currentTurn.length === 2) {
@@ -128,7 +139,7 @@ const App = () => {
 
   return (
       <div className="container">
-        <Header />
+        <Header handleReset={handleReset} />
         <div className="images">
           {shuffledImages.map((image) => (
             <Card image={image} flipped={flipped.includes(image.uniqueId)} handleFlip={handleFlip} key={image.uniqueId} />
