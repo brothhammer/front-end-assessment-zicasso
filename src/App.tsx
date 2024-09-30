@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import Header from './components/header'
 import australianShepherd from './assets/australian-shepherd.jpg'
@@ -66,43 +66,67 @@ const imagesArray = [
   },
 ]
 
-const App = () => {
-  const [flipped, setFlipped] = useState<{ [key: string]: boolean }>({});
+const shuffleArray = (array: Array<{ id: string; image: string }>) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
 
-  const handleFlip = (id: string) => {
-    setFlipped(prevState => ({
-      ...prevState,
-      [id]: !prevState[id]
-    }));
+const App = () => {
+  const [flipped, setFlipped] = useState<string[]>([]);
+  const [currentTurn, setCurrentTurn] = useState<string[]>([]);
+  const [shuffledImages, setShuffledImages] = useState<{ id: string, image: string, uniqueId: string }[]>([]);
+
+  // shuffle the images, double them, add unique id and shuffle again
+  useEffect(() => {
+    const imagesCopy = imagesArray.slice();
+    const shuffledCopy = shuffleArray(imagesCopy)
+    const randomImages = shuffledCopy.slice(0, 6)
+    const doubleImages = [...randomImages, ...randomImages]
+    const shuffledDoubleImages = shuffleArray(doubleImages)
+    const imagesWithUniqueId = shuffledDoubleImages.map((image, index) => ({
+      ...image,
+      uniqueId: `${image.id}-${index}`
+    })
+    )
+    setShuffledImages(imagesWithUniqueId)
+  }, [])
+
+  const handleFlip = (uniqueId: string, id: string) => {
+    setCurrentTurn([...currentTurn, id]);
+    setFlipped(prevState => 
+      prevState.includes(uniqueId) 
+        ? prevState.filter(id => id !== uniqueId) 
+        : [...prevState, uniqueId]
+    );
   };
 
+  const checkMatch = useCallback((currentTurn: string[]) => {
+    if (currentTurn.length === 2) {
+      if (currentTurn[0] === currentTurn[1]) {
+        setCurrentTurn([]);
+      } else {
+        setTimeout(() => {
+          setFlipped(flipped.slice(0, -2));
+          setCurrentTurn([]);
+        }, 1000);
+      }
+    }
+  }, [flipped]);
+
+  useEffect(() => {
+    checkMatch(currentTurn);
+  }, [currentTurn, checkMatch]);
+  
 
   return (
       <div className="container">
         <Header />
         <div className="images">
-          {imagesArray.map((image) => (
-            <Card image={image} flipped={flipped} handleFlip={handleFlip} />
-            // <div
-            //   key={image.id}
-            //   className={`card ${flipped[image.id] ? 'flipped' : ''}`}
-            //   onClick={() => handleFlip(image.id)}
-            //   >
-            //     <div className="card-inner">
-            //       {!flipped[image.id] ? (
-            //       <div className="card-front">
-            //         <p>front of card</p>
-            //       </div>
-            //       ) : (
-            //       <div className="card-back">
-            //         <img
-            //           src={image.image}
-            //           alt={image.id}
-            //         />
-            //       </div>
-            //       )}
-            //     </div>
-            // </div>
+          {shuffledImages.map((image) => (
+            <Card image={image} flipped={flipped.includes(image.uniqueId)} handleFlip={handleFlip} key={image.uniqueId} />
           ))}
         </div>
       </div>
