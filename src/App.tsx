@@ -78,6 +78,7 @@ const App = () => {
   const [flipped, setFlipped] = useState<string[]>([]);
   const [currentTurn, setCurrentTurn] = useState<string[]>([]);
   const [shuffledImages, setShuffledImages] = useState<{ id: string, image: string, uniqueId: string }[]>([]);
+  const [isFlippingAllowed, setIsFlippingAllowed] = useState(true);
 
   // shuffle the images, double them, add unique id and shuffle again
   useEffect(() => {
@@ -95,6 +96,7 @@ const App = () => {
   }, [])
 
   const handleFlip = (uniqueId: string, id: string) => {
+    if (!isFlippingAllowed) return;
     setCurrentTurn([...currentTurn, id]);
     setFlipped(prevState => 
       prevState.includes(uniqueId) 
@@ -105,12 +107,15 @@ const App = () => {
 
   const checkMatch = useCallback((currentTurn: string[]) => {
     if (currentTurn.length === 2) {
+      setIsFlippingAllowed(false);
       if (currentTurn[0] === currentTurn[1]) {
         setCurrentTurn([]);
+        setIsFlippingAllowed(true);
       } else {
         setTimeout(() => {
           setFlipped(flipped.slice(0, -2));
           setCurrentTurn([]);
+          setIsFlippingAllowed(true);
         }, 1000);
       }
     }
