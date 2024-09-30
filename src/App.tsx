@@ -2,9 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import Header from './components/header'
 import { imagesArray } from './assets/constants'
-import Card from './components/card'
-
-
+import CardGrid from './components/card-grid'
 
 const shuffleArray = (array: Array<{ id: string; image: string }>) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -80,11 +78,7 @@ const App = () => {
   return (
       <div className="container">
         <Header handleReset={handleReset} />
-        <div className="images">
-          {shuffledImages.map((image) => (
-            <Card image={image} flipped={flipped.includes(image.uniqueId)} handleFlip={handleFlip} key={image.uniqueId} />
-          ))}
-        </div>
+        <CardGrid shuffledImages={shuffledImages} flipped={flipped} handleFlip={handleFlip} />
       </div>
   )
 }
