@@ -11,6 +11,18 @@ interface CardProps {
     handleFlip: (uniqueId: string, id: string) => void; // Function to handle flip
   }
 
+  /**
+ * Card component represents a single card in the memory game.
+ * 
+ * @param {Object} props - The properties object.
+ * @param {Object} props.image - The image object containing id, image, and uniqueId.
+ * @param {string} props.image.id - The dog breed.
+ * @param {string} props.image.image - The file location of the image.
+ * @param {string} props.image.uniqueId - The unique identifier for the card.
+ * @param {boolean} props.flipped - Boolean to check if the card is flipped.
+ * @param {function} props.handleFlip - Function to handle the flip action.
+ * @returns {JSX.Element} The rendered card component.
+ */
 const Card = ({ image, flipped, handleFlip }: CardProps) => {
     return (
     <div

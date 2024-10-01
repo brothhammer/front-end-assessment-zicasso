@@ -84,10 +84,12 @@ const App = () => {
     }
   }, [flipped, hardMode, setFlipped, setCurrentTurn, setMoves]);
 
+  // check if the cards match
   useEffect(() => {
     checkMatch(currentTurn);
   }, [currentTurn, checkMatch]);
 
+  // check if the game is won
   useEffect(() => {
     if (shuffledImages.length > 0 && flipped.length === shuffledImages.length) {
       setGameWon(true);
