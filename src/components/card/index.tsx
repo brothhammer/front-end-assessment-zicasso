@@ -1,5 +1,5 @@
-import React from 'react';
 import './card.css';
+import DogSVG from '../../assets/dog.svg';
 
 interface CardProps {
     image: {
@@ -21,7 +21,7 @@ const Card = ({ image, flipped, handleFlip }: CardProps) => {
                 <div className="card-inner">
                   {!flipped ? (
                   <div className="card-front">
-                    <p>front of card</p>
+                     <img src={DogSVG} alt="Dog" width="100" height="100" />
                   </div>
                   ) : (
                   <div className="card-back">
