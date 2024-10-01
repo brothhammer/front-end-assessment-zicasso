@@ -12,3 +12,7 @@
   border-radius: 8px;
   padding: 1rem; /* Add padding inside the container */
 }
+
+.scoreboard {
+  padding: 1rem;
+}
