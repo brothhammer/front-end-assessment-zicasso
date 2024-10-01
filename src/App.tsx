@@ -3,6 +3,7 @@ import './App.css'
 import Header from './components/header'
 import { imagesArray } from './assets/constants'
 import CardGrid from './components/card-grid'
+import WinModal from './components/win-modal'
 
 const shuffleArray = (array: Array<{ id: string; image: string }>) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -17,6 +18,10 @@ const App = () => {
   const [currentTurn, setCurrentTurn] = useState<string[]>([]);
   const [shuffledImages, setShuffledImages] = useState<{ id: string, image: string, uniqueId: string }[]>([]);
   const [isFlippingAllowed, setIsFlippingAllowed] = useState(true);
+  const [moves, setMoves] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
+  const [gameWon, setGameWon] = useState(false);
+  const [hardMode, setHardMode] = useState(false);
 
   // shuffle the images, double them, add unique id and shuffle again
   const shuffleImages = () => {
@@ -51,6 +56,8 @@ const App = () => {
     setFlipped([]);
     setCurrentTurn([]);
     setIsFlippingAllowed(true);
+    setGameWon(false);
+    setMoves(0);
     shuffleImages();
   }
 
@@ -62,24 +69,40 @@ const App = () => {
         setIsFlippingAllowed(true);
       } else {
         setTimeout(() => {
-          setFlipped(flipped.slice(0, -2));
+          setFlipped(hardMode ? [] : flipped.slice(0, -2));
           setCurrentTurn([]);
           setIsFlippingAllowed(true);
         }, 1000);
       }
+      setMoves((moves) => moves + 1);
     }
-  }, [flipped]);
+  }, [flipped, hardMode]);
 
   useEffect(() => {
     checkMatch(currentTurn);
   }, [currentTurn, checkMatch]);
-  
 
+  useEffect(() => {
+    if (shuffledImages.length > 0 && flipped.length === shuffledImages.length) {
+      setGameWon(true);
+      if (moves < bestScore || bestScore === 0) {
+        setBestScore(moves + 1);
+      }
+    }
+  }, [flipped, shuffledImages, moves, bestScore]);
+  
   return (
+    <>        
+      <WinModal show={gameWon} onClose={() => setGameWon(false)} onReset={handleReset} currentScore={moves} bestScore={bestScore} />
       <div className="container">
-        <Header handleReset={handleReset} />
+        <Header handleReset={handleReset} setHardMode={setHardMode} hardMode={hardMode}/>
         <CardGrid shuffledImages={shuffledImages} flipped={flipped} handleFlip={handleFlip} />
+        <div className="scoreboard">
+          <span>Moves: {moves}{" "}</span>
+          <span>Best Score: {bestScore}</span>
+        </div>
       </div>
+    </>
   )
 }
 
