@@ -24,6 +24,12 @@ const formattedName = (str: string) : string => {
     .join(' ');
 };
 
+
+/**
+ * The main App component.
+ * 
+ * @returns {JSX.Element} The rendered App component.
+ */
 const App = () => {
   const [flipped, setFlipped] = useLocalStorageState<string[]>('flipped', []);
   const [currentTurn, setCurrentTurn] = useLocalStorageState<string[]>('currentTurn', []);
@@ -119,7 +125,7 @@ const App = () => {
     <>        
       <WinModal show={gameWon} onClose={() => setGameWon(false)} onReset={handleReset} currentScore={moves} bestScore={bestScore} />
       <div className="container">
-        <Header handleReset={handleReset} setHardMode={setHardMode} hardMode={hardMode}/>
+        <Header handleReset={handleReset} setHardMode={setHardMode} hardMode={hardMode} moves={moves} />
         <div className="matched-breed">{formattedName(matchedBreed || "") || ""}</div>
         <CardGrid shuffledImages={shuffledImages} flipped={flipped} handleFlip={handleFlip} />
         <div className="scoreboard">
