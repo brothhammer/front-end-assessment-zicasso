@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import Header from './components/header'
 import { imagesArray } from './assets/constants'
@@ -14,14 +14,52 @@ const shuffleArray = (array: Array<{ id: string; image: string }>) => {
 };
 
 const App = () => {
-  const [flipped, setFlipped] = useState<string[]>([]);
-  const [currentTurn, setCurrentTurn] = useState<string[]>([]);
-  const [shuffledImages, setShuffledImages] = useState<{ id: string, image: string, uniqueId: string }[]>([]);
-  const [isFlippingAllowed, setIsFlippingAllowed] = useState(true);
-  const [moves, setMoves] = useState(0);
-  const [bestScore, setBestScore] = useState(0);
-  const [gameWon, setGameWon] = useState(false);
-  const [hardMode, setHardMode] = useState(false);
+  const [flipped, setFlipped] = useState<string[]>(() => {
+    const storedFlipped = window.localStorage.getItem('flipped');
+    return storedFlipped ? JSON.parse(storedFlipped) : [];
+  });
+  
+  const [currentTurn, setCurrentTurn] = useState<string[]>(() => {
+    const storedCurrentTurn = window.localStorage.getItem('currentTurn');
+    return storedCurrentTurn ? JSON.parse(storedCurrentTurn) : [];
+  });
+  
+  const [shuffledImages, setShuffledImages] = useState<{ id: string, image: string, uniqueId: string }[]>(() => {
+    const storedShuffledImages = window.localStorage.getItem('shuffledImages');
+    return storedShuffledImages ? JSON.parse(storedShuffledImages) : [];
+  });
+
+  const [isFlippingAllowed, setIsFlippingAllowed] = useState<boolean>(true);
+  
+  const [moves, setMoves] = useState<number>(() => {
+    const storedMoves = window.localStorage.getItem('moves');
+    return storedMoves ? JSON.parse(storedMoves) : 0;
+  });
+ 
+  const [bestScore, setBestScore] = useState<number>(() => {
+    const storedBestScore = window.localStorage.getItem('bestScore');
+    return storedBestScore ? JSON.parse(storedBestScore) : 0;
+  });
+ 
+  const [gameWon, setGameWon] = useState<boolean>(() => { 
+    const storedGameWon = window.localStorage.getItem('gameWon');
+    return storedGameWon ? JSON.parse(storedGameWon) : false;
+  });
+  
+  const [hardMode, setHardMode] = useState<boolean>(() => {
+    const storedHardMode = window.localStorage.getItem('hardMode');
+    return storedHardMode ? JSON.parse(storedHardMode) : false;
+  });
+
+  React.useEffect(() => {
+    window.localStorage.setItem('flipped', JSON.stringify(flipped));
+    window.localStorage.setItem('currentTurn', JSON.stringify(currentTurn));
+    window.localStorage.setItem('shuffledImages', JSON.stringify(shuffledImages));
+    window.localStorage.setItem('moves', JSON.stringify(moves));
+    window.localStorage.setItem('bestScore', JSON.stringify(bestScore));
+    window.localStorage.setItem('gameWon', JSON.stringify(gameWon));
+    window.localStorage.setItem('hardMode', JSON.stringify(hardMode));
+  }, [flipped, currentTurn, shuffledImages, moves, bestScore, gameWon, hardMode]);
 
   // shuffle the images, double them, add unique id and shuffle again
   const shuffleImages = () => {
@@ -37,9 +75,14 @@ const App = () => {
     setShuffledImages(imagesWithUniqueId);
   };
 
-  // shuffle the images on component mount
+  // shuffle the images on component mount if the local storage is empty
   useEffect(() => {
-    shuffleImages();
+    const storedShuffledImages = window.localStorage.getItem('shuffledImages');
+    // check if the shuffled images are in local storage and if not, shuffle them
+    if (!storedShuffledImages || JSON.parse(storedShuffledImages).length === 0) {
+      shuffleImages();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFlip = (uniqueId: string, id: string) => {
@@ -76,7 +119,7 @@ const App = () => {
       }
       setMoves((moves) => moves + 1);
     }
-  }, [flipped, hardMode]);
+  }, [flipped, hardMode, setFlipped, setCurrentTurn, setMoves]);
 
   useEffect(() => {
     checkMatch(currentTurn);
@@ -89,7 +132,7 @@ const App = () => {
         setBestScore(moves + 1);
       }
     }
-  }, [flipped, shuffledImages, moves, bestScore]);
+  }, [flipped, shuffledImages, moves, bestScore, setBestScore, setGameWon]);
   
   return (
     <>        
