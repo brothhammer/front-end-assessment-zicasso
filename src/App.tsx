@@ -14,6 +14,15 @@ const shuffleArray = (array: Array<{ id: string; image: string }>) => {
   return array;
 };
 
+// take the id of the image and format it to a readable name
+const formattedName = (str: string) : string => {
+  return str
+    .replace(/-/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 const App = () => {
   const [flipped, setFlipped] = useLocalStorageState<string[]>('flipped', []);
   const [currentTurn, setCurrentTurn] = useLocalStorageState<string[]>('currentTurn', []);
@@ -23,6 +32,7 @@ const App = () => {
   const [bestScore, setBestScore] = useLocalStorageState<number>('bestScore', 0);
   const [gameWon, setGameWon] = useLocalStorageState<boolean>('gameWon', false);
   const [hardMode, setHardMode] = useLocalStorageState<boolean>('hardMode', false);
+  const [matchedBreed, setMatchedBreed] = useState<string | null>(null);
 
   // shuffle the images, double them, add unique id and shuffle again
   const shuffleImages = () => {
@@ -71,6 +81,10 @@ const App = () => {
     if (currentTurn.length === 2) {
       setIsFlippingAllowed(false);
       if (currentTurn[0] === currentTurn[1]) {
+        setMatchedBreed(currentTurn[0]);
+        setTimeout(() => {
+          setMatchedBreed(null);
+        }, 2000);
         setCurrentTurn([]);
         setIsFlippingAllowed(true);
       } else {
@@ -104,6 +118,7 @@ const App = () => {
       <WinModal show={gameWon} onClose={() => setGameWon(false)} onReset={handleReset} currentScore={moves} bestScore={bestScore} />
       <div className="container">
         <Header handleReset={handleReset} setHardMode={setHardMode} hardMode={hardMode}/>
+        <div className="matched-breed">{formattedName(matchedBreed || "") || ""}</div>
         <CardGrid shuffledImages={shuffledImages} flipped={flipped} handleFlip={handleFlip} />
         <div className="scoreboard">
           <span>Moves: {moves}{" "}</span>
