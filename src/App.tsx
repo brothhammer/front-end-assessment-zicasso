@@ -6,6 +6,7 @@ import CardGrid from './components/card-grid'
 import WinModal from './components/win-modal'
 import useLocalStorageState from './hooks/useLocalStorageState'
 
+// shuffle the array of images
 const shuffleArray = (array: Array<{ id: string; image: string }>) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -81,6 +82,7 @@ const App = () => {
     if (currentTurn.length === 2) {
       setIsFlippingAllowed(false);
       if (currentTurn[0] === currentTurn[1]) {
+        // set the matched breed to display it on the screen for a short time
         setMatchedBreed(currentTurn[0]);
         setTimeout(() => {
           setMatchedBreed(null);
